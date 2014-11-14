@@ -1,0 +1,12 @@
+{
+  "undef": true,
+  "unused": false,
+  "predef": [ 
+	  "THREE",
+	  "camera", "scene", "renderer",
+	  "effect", "controls",
+	  "element", "container",
+	  "init", "resize", "update", "render", "animate", "fullscreen", "exampleScene",
+	  "photoUrls"
+  ]
+}
