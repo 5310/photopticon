@@ -50,15 +50,28 @@ var parseAlbums = function() {
 // Parses the album.
 var albums = parseAlbums( 'photos' );
 
-// Stores the parsed albums into a json file that will be read by the frontend.
+//// Stores the parsed albums into a json file that may be read by the frontend.
+//fs.writeFile( 
+//	"albums.json", 
+//	JSON.stringify( albums ), 
+//	function( err ) {
+//		if( err ) { 
+//			console.log( err ); 
+//		} else {
+//			console.log( "Albums parsed succesfully and saved to `albums.json`." );
+//		}
+//	} 
+//);
+
+// Stores the parsed albums into a global object called 'albums' in a js file that will be linked by the frontend.
 fs.writeFile( 
-	"albums.json", 
-	JSON.stringify( albums ), 
+	"photos/albums.js", 
+	"var albums = " + JSON.stringify( albums ) + ";", 
 	function( err ) {
 		if( err ) { 
 			console.log( err ); 
 		} else {
-			console.log( "Albums parsed succesfully." );
+			console.log( "Albums parsed succesfully and saved to `photos/albums.js`." );
 		}
 	} 
 );

@@ -5,10 +5,8 @@
 //scene.add( meshBox );
 
 // Interaction globals.
-
 var projector = new THREE.Projector();
 var raycaster = new THREE.Raycaster();
-
 var select = function( intersectables ) {
 	var gaze = new THREE.Vector3(0, 0, 1);
 	projector.unprojectVector(gaze, camera);
@@ -137,8 +135,7 @@ Photo.prototype = Object.create(THREE.Object3D.prototype);
 Photo.prototype.constructor = Photo;
 Photo.FOCUSDISTANCE = 20;
 
-// Album class and generation.
-
+// Album class.
 var Album = function( photoUrls ) {
 	
 	this.totalPages = Math.ceil( photoUrls.length / Album.MAXPHOTOPERPAGE );
@@ -225,7 +222,7 @@ Album.prototype._create = function() { // The photos to load for this "page." Ha
 		var center = - Math.PI*2/4 * i;
 		if ( indices[index] ) {
 			var p = new Photo( 
-				"textures/photos/"+indices[index], 
+				indices[index], 
 				center + Math.cos( Math.random()*Math.PI*2 ) * 0.15, 
 				0 + Math.sin( Math.random()*Math.PI*2 ) * 0.15, 
 				0.1,
@@ -240,7 +237,7 @@ Album.prototype._create = function() { // The photos to load for this "page." Ha
 			index = i*7 + 1 + j;
 			if ( indices[index] ) {
 				var p = new Photo( 
-					"textures/photos/"+indices[index], 
+					indices[index], 
 					center + Math.cos( Math.PI*2/6 * j + rotation ) * 0.5 + Math.cos( Math.random()*Math.PI*2 ) * 0.15, 
 					Math.sin( Math.PI*2/6 * j + rotation ) * 0.5 + Math.sin( Math.random()*Math.PI*2 ) * 0.15, 
 					0.1,
@@ -343,10 +340,13 @@ Album.prototype._hide = function( dt, reverse ) {
 };
 Album.MAXPHOTOPERPAGE = 28;
 Album.PHOTOSIZE = 50;
-Album.SHOWSPEEDMULTIPLIER = 0.5;
+Album.SHOWSPEEDMULTIPLIER = 0.75;
 Album.HIDESPEEDMULTIPLIER = 5;
 
-var album = new Album( photoUrls );
+
+
+// Album generation.
+var album = new Album( albums['k550i'] );
 
 // Tick function override.
 function tick( dt ) {
