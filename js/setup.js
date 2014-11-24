@@ -10,7 +10,9 @@ animate();
 
 function init() {
 
-	renderer = new THREE.WebGLRenderer();
+	renderer = new THREE.WebGLRenderer({
+		antialias: true
+	});
 	element = renderer.domElement;
 	container = document.getElementById('example');
 	container.appendChild(element);
@@ -20,7 +22,7 @@ function init() {
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-//	camera.position.set(0, 0, 10);
+	//	camera.position.set(0, 0, 10);
 	camera.up.set( 0, 0, 1 );
 	scene.add(camera);
 
@@ -86,7 +88,7 @@ function animate(t) {
 
 	update(clock.getDelta());
 	render(clock.getDelta());
-	
+
 	if ( tick ) tick(clock.getDelta());
 
 }
@@ -104,7 +106,7 @@ function fullscreen() {
 }
 
 function exampleScene() {
-	
+
 	var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
 	light.position.set( 0, 0, 100 );
 	scene.add( light );
