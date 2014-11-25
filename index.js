@@ -1,5 +1,5 @@
 var fs = require('fs');
-var path = require('path')
+var path = require('path');
 
 // Returns an object containing albums by directory name and an array of all photos within that directory by parsing the 'photos' folder.
 var parseAlbums = function() {

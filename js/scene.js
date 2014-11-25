@@ -7,11 +7,22 @@
 // Interaction globals.
 var projector = new THREE.Projector();
 var raycaster = new THREE.Raycaster();
-var select = function( intersectables ) {
+var getSelection = function( intersectables ) {
 	var gaze = new THREE.Vector3(0, 0, 1);
 	projector.unprojectVector(gaze, camera);
 	raycaster.set( camera.position, gaze.sub( camera.position ).normalize() );
 	return raycaster.intersectObjects( intersectables, true );
+};
+var getUrlParameter = function( name ) {
+	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp( regexS );
+	var results = regex.exec( location.href );
+	if ( results === null ) {
+		return null;
+	} else {
+		return results[1];
+	}
 };
 
 // Cursor class and generation.
@@ -73,7 +84,7 @@ var Photo = function( i, yaw, pitch, size, distance ) {
 		self._photo.position.x = distance;
 		self._photo.scale.set( size, size, size );
 		self.add( self._photo );
-		
+
 		self._photo._photo = self;
 
 	} );
@@ -137,9 +148,9 @@ Photo.FOCUSDISTANCE = 20;
 
 // Album class.
 var Album = function( photoUrls ) {
-	
+
 	this.totalPages = Math.ceil( photoUrls.length / Album.MAXPHOTOPERPAGE );
-	
+
 	this.photoUrls = []
 	var i, j;
 	var k = 0;
@@ -155,9 +166,9 @@ var Album = function( photoUrls ) {
 	for ( k; k < photoUrls.length; k++ ) {
 		this.photoUrls[ this.photoUrls.length-1 ].push( photoUrls[k] );
 	}
-	
+
 	this.activePageIndex = 0;
-	
+
 	this.state = 0;
 };
 Album.prototype.update = function( dt ) {
@@ -195,7 +206,7 @@ Album.prototype.previous = function() {
 	this.state = 3;
 };
 Album.prototype._create = function() { // The photos to load for this "page." Has to be less than the maximum that fits in a page, 28. Preferably a slice.
-	
+
 	var photos = this.photoUrls[ this.activePageIndex ].slice(0);
 
 	var total = 4*7;
@@ -254,11 +265,11 @@ Album.prototype._create = function() { // The photos to load for this "page." Ha
 
 };
 Album.prototype._show = function( dt ) {
-	
+
 	if ( !this.page.show ) {
 		this.page.show = 0;
 	}
-	
+
 	if ( this.page.show < 1 ) {
 		this.page.show += dt*10 * Album.SHOWSPEEDMULTIPLIER;
 		if ( this.page.show > 1 ) this.page.show = 1;
@@ -269,11 +280,11 @@ Album.prototype._show = function( dt ) {
 			photo.size = Math.sqrt( this.page.show ) * Album.PHOTOSIZE;
 		}
 	}
-	
+
 };
 Album.prototype._focus = function( dt ) {
 	// Get focal photo.
-	var selection = select( this.page );
+	var selection = getSelection( this.page );
 	if ( selection.length ) {
 		selection = selection[0].object._photo;
 	} else {
@@ -292,7 +303,7 @@ Album.prototype._focus = function( dt ) {
 			if ( photo.focus < 0.01 ) {
 				photo.focus = 0.01;
 			} else {
-			photo.focus += ( 1 - photo.focus ) / ( 5 * dt * 60 * 20 );
+				photo.focus += ( 1 - photo.focus ) / ( 5 * dt * 60 * 20 );
 			}			
 			if ( photo.focus > 1 ) {
 				photo.focus = 1;
@@ -301,13 +312,13 @@ Album.prototype._focus = function( dt ) {
 	}
 };
 Album.prototype._hide = function( dt, reverse ) {
-	
+
 	if ( !this.page.hide ) {
 		this.page.hide = 0;
 	}
-	
+
 	var height = reverse ? -100 : 100;
-	
+
 	if ( this.page.hide < 1 ) {
 		var interpolation;
 		var step = 0.5 / this.page.length;
@@ -336,7 +347,7 @@ Album.prototype._hide = function( dt, reverse ) {
 			this.page.pop();
 		}
 	}
-	
+
 };
 Album.MAXPHOTOPERPAGE = 28;
 Album.PHOTOSIZE = 50;
@@ -346,7 +357,12 @@ Album.HIDESPEEDMULTIPLIER = 5;
 
 
 // Album generation.
-var album = new Album( albums['k550i'] );
+var albumUrls = albums[ getUrlParameter( 'album' ) ];
+if ( !albumUrls ) {
+	var albumNames = Object.getOwnPropertyNames( albums );
+	albumUrls = albums[ albumNames[ Math.floor( Math.random() * albumNames.length ) ] ];
+}
+var album = new Album( albumUrls );
 
 // Tick function override.
 function tick( dt ) {
