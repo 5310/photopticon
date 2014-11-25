@@ -28,7 +28,7 @@ var getUrlParameter = function( name ) {
 // Cursor class and generation.
 var Cursor = function( camera ) {
 	var geometry = new THREE.RingGeometry(
-		0.85 * Cursor.SIZE, 1 * Cursor.SIZE, 32
+		0.6 * Cursor.SIZE, 1 * Cursor.SIZE, 32
 	);
 	var material = new THREE.MeshBasicMaterial(
 		{
@@ -170,8 +170,37 @@ var Album = function( photoUrls ) {
 	this.activePageIndex = 0;
 
 	this.state = 0;
+	
+	var geometry = new THREE.CircleGeometry( 16, 8	);
+	var materialNext = new THREE.MeshBasicMaterial(
+		{
+			blending: THREE.AdditiveBlending,
+			side: THREE.DoubleSide,
+			map: THREE.ImageUtils.loadTexture( 'assets/label_next.png' )
+		}
+	);
+	var materialPrev = new THREE.MeshBasicMaterial(
+		{
+			blending: THREE.AdditiveBlending,
+			side: THREE.DoubleSide,
+			map: THREE.ImageUtils.loadTexture( 'assets/label_prev.png' )
+		}
+	);
+
+	this.scrollTimer = 0;
+	this.nextTarget = new THREE.Mesh( geometry, materialNext );
+	scene.add( this.nextTarget );
+	this.nextTarget.direction = 1;
+	this.nextTarget.position.z = -100;
+	this.previousTarget = new THREE.Mesh( geometry, materialPrev );
+	scene.add( this.previousTarget );
+	this.previousTarget.position.z = 100;
+	this.previousTarget.rotation.x = Math.PI;
+	this.previousTarget.direction = -1;
+	
 };
 Album.prototype.update = function( dt ) {
+	// State logic.
 	switch ( this.state ) {
 		case 0: // Load currently active page.
 			this._create();
@@ -183,6 +212,7 @@ Album.prototype.update = function( dt ) {
 			break;
 		case 2:
 			this._focus( dt );
+			this._scroll( dt );
 			break;
 		case 3: // This state is achieved externally. Just set the new active photos list and then set in motion.
 			this._hide( dt );
@@ -193,6 +223,9 @@ Album.prototype.update = function( dt ) {
 			if ( this.page.hide === 1 ) this.state = 0;
 			break;
 	};
+	// Enspriten targets.
+	this.nextTarget.rotation.z = camera.rotation.z;
+	this.previousTarget.rotation.z = camera.rotation.z;
 };
 Album.prototype.next = function() {
 	this.activePageIndex++;
@@ -317,7 +350,7 @@ Album.prototype._hide = function( dt, reverse ) {
 		this.page.hide = 0;
 	}
 
-	var height = reverse ? -100 : 100;
+	var height = reverse ? -500 : 500;
 
 	if ( this.page.hide < 1 ) {
 		var interpolation;
@@ -331,7 +364,7 @@ Album.prototype._hide = function( dt, reverse ) {
 			}
 			if ( interpolation < 1 ) {
 				photo.position.z += ( height - photo.position.z ) * interpolation;
-				var s = photo.size * ( 1 - interpolation );
+				var s = photo.size * ( 1 - interpolation*0.9 );
 				if ( s > 0.1 ) photo.size = s;
 			}
 		}
@@ -349,10 +382,43 @@ Album.prototype._hide = function( dt, reverse ) {
 	}
 
 };
+Album.prototype._scroll = function( dt ) {
+	// Get scroll direction.
+	var selection = getSelection( [ this.nextTarget, this.previousTarget ] );
+	if ( selection.length ) {
+		selection = selection[0].object.direction;
+	} else {
+		selection = null;
+	}
+	// Increment or reset the scrollTimer.
+	if ( selection ) {
+		this.scrollTimer += dt * 10 * Album.SCROLLTIMERMULTIPLIER;
+	} else {
+		this.scrollTimer = 0;
+	}
+	if ( this.scrollTimer >= 1 ) {
+		this.scrollTimer = 0; // Delay the scrollTimer.
+		switch ( selection ) {
+			case -1:
+				this.previous();
+				break;
+			case 1:
+				this.next();
+				break;
+		}
+	}
+	// Shrink cursor if hovering.
+	if ( selection ) {
+		cursor.scale.set( 1-this.scrollTimer, 1-this.scrollTimer, 1-this.scrollTimer );
+	} else {
+		cursor.scale.set( 1, 1, 1 );
+	}
+};
 Album.MAXPHOTOPERPAGE = 28;
 Album.PHOTOSIZE = 50;
-Album.SHOWSPEEDMULTIPLIER = 0.75;
-Album.HIDESPEEDMULTIPLIER = 5;
+Album.SHOWSPEEDMULTIPLIER = 1.25;
+Album.HIDESPEEDMULTIPLIER = 3;
+Album.SCROLLTIMERMULTIPLIER = 3;
 
 
 
