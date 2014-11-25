@@ -68,24 +68,31 @@ var Photo = function( i, yaw, pitch, size, distance ) {
 	this.rotation.order = "ZYX";
 	this.rotation.z = yaw;
 	this.rotation.y = pitch;
-
+	
+	// The actual photo with placeholder icon.
+	this._photo = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'assets/photo.png' ) } ) );	
+	this._photo.rotation.y = -Math.PI/2;
+	this._photo.rotation.z = -Math.PI/2;
+	this._photo.position.x = distance;
+	this._photo.scale.set( size, size, size );
+	this.add( this._photo );
+	this._photo._photo = this;
+	
 	var self = this;
-	var image = THREE.ImageUtils.loadTexture( i, undefined, function() {
+	var texture_photo = THREE.ImageUtils.loadTexture( i, undefined, function() {
+		
+		// When the actual photo texture loads, set it, and fix proportions.
 
-		image.anisotropy = renderer.getMaxAnisotropy();
+		texture_photo.anisotropy = renderer.getMaxAnisotropy();
 
-		var diagonal = Math.atan2( image.image.height, image.image.width );
+		var diagonal = Math.atan2( texture_photo.image.height, texture_photo.image.width );
 		var x = Math.cos( diagonal );
 		var y = Math.sin( diagonal );
 
-		self._photo = new THREE.Mesh( new THREE.PlaneGeometry( x, y ), new THREE.MeshBasicMaterial( { map: image } ) );	
-		self._photo.rotation.y = -Math.PI/2;
-		self._photo.rotation.z = -Math.PI/2;
-		self._photo.position.x = distance;
-		self._photo.scale.set( size, size, size );
-		self.add( self._photo );
-
-		self._photo._photo = self;
+		var geometry = new THREE.PlaneGeometry( x, y );
+		self._photo.geometry.vertices = geometry.vertices;
+		self._photo.geometry.verticesNeedUpdate = true;
+		self._photo.material = new THREE.MeshBasicMaterial( { map: texture_photo } );
 
 	} );
 
@@ -176,14 +183,14 @@ var Album = function( photoUrls ) {
 		{
 			blending: THREE.AdditiveBlending,
 			side: THREE.DoubleSide,
-			map: THREE.ImageUtils.loadTexture( 'assets/label_next.png' )
+			map: THREE.ImageUtils.loadTexture( 'assets/down.png' )
 		}
 	);
 	var materialPrev = new THREE.MeshBasicMaterial(
 		{
 			blending: THREE.AdditiveBlending,
 			side: THREE.DoubleSide,
-			map: THREE.ImageUtils.loadTexture( 'assets/label_prev.png' )
+			map: THREE.ImageUtils.loadTexture( 'assets/up.png' )
 		}
 	);
 
@@ -423,8 +430,10 @@ Album.SCROLLTIMERMULTIPLIER = 3;
 
 
 // Album generation.
-var albumName = getUrlParameter( 'album' );
+var albumName = decodeURIComponent( getUrlParameter( 'album' ) );
 var albumUrls = albums[ albumName ];
+console.log(albumName)
+console.log(albumUrls)
 if ( !albumUrls ) {
 	var albumNames = Object.getOwnPropertyNames( albums );
 	albumName = albumNames[ Math.floor( Math.random() * albumNames.length ) ];
