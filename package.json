@@ -1,0 +1,23 @@
+{
+  "name": "photopticon",
+  "version": "0.1.0",
+  "description": "A VR photo viewer made for Google Cardboard.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vr",
+    "chrome",
+    "experiments",
+    "google",
+    "cardboard",
+    "three.js"
+  ],
+  "author": "Sayantan Chaudhuri",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^0.11.1",
+    "express": "^4.10.4"
+  }
+}
