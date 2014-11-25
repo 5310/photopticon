@@ -423,12 +423,16 @@ Album.SCROLLTIMERMULTIPLIER = 3;
 
 
 // Album generation.
-var albumUrls = albums[ getUrlParameter( 'album' ) ];
+var albumName = getUrlParameter( 'album' );
+var albumUrls = albums[ albumName ];
 if ( !albumUrls ) {
 	var albumNames = Object.getOwnPropertyNames( albums );
-	albumUrls = albums[ albumNames[ Math.floor( Math.random() * albumNames.length ) ] ];
+	albumName = albumNames[ Math.floor( Math.random() * albumNames.length ) ];
+	albumUrls = albums[ albumName ];
 }
 var album = new Album( albumUrls );
+document.title = "Photopticon Viewer" + " : " + albumName;
+
 
 // Tick function override.
 function tick( dt ) {
