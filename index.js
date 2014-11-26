@@ -15,4 +15,4 @@ for ( var i = 0; i < albumNames.length; i++ ) {
 }
 markup.unshift( 'div#albums' );
 
-shaven(	[ document.body, markup ] );
+shaven(	[ document.body, [ 'main', markup ] ] );

@@ -1,6 +1,6 @@
 # Photopticon
 
-Photopticon is a web-based VR photo-viewer made for the Google Cardboard. It displays normal ol' photos, but in a simple VR environment.
+Photopticon is a web-based VR photo-viewing environment made for the Google Cardboard.
 
 Seeing how well, within reasons, the [Chrome Experiments for Cardboard](http://vr.chromeexperiments.com/) ran, I decided to try making something VR-y for myself _"as a learning experience."_ Didn't have any feasible ideas, and so I listened to the simplest suggestion I could find.
 
