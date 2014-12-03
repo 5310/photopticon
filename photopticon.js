@@ -2,7 +2,8 @@
 //var geomBox = new THREE.BoxGeometry( 100, 100, 100 ); 
 //var matWire = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 //var meshBox = new THREE.Mesh( geomBox, matWire ); 
-//scene.add( meshBox );
+////scene.add( meshBox );
+//cameraRig.add( meshBox );
 
 // Interaction globals.
 var projector = new THREE.Projector();
@@ -156,6 +157,8 @@ Photo.FOCUSDISTANCE = 20;
 // Album class.
 var Album = function( photoUrls ) {
 
+	THREE.Object3D.call(this);
+
 	this.totalPages = Math.ceil( photoUrls.length / Album.MAXPHOTOPERPAGE );
 
 	this.photoUrls = []
@@ -196,16 +199,18 @@ var Album = function( photoUrls ) {
 
 	this.scrollTimer = 0;
 	this.nextTarget = new THREE.Mesh( geometry, materialNext );
-	scene.add( this.nextTarget );
+	this.add( this.nextTarget );
 	this.nextTarget.direction = 1;
 	this.nextTarget.position.z = -100;
 	this.previousTarget = new THREE.Mesh( geometry, materialPrev );
-	scene.add( this.previousTarget );
+	this.add( this.previousTarget );
 	this.previousTarget.position.z = 100;
 	this.previousTarget.rotation.x = Math.PI;
 	this.previousTarget.direction = -1;
 	
 };
+Album.prototype = Object.create(THREE.Object3D.prototype);
+Album.prototype.constructor = Album;
 Album.prototype.update = function( dt ) {
 	// State logic.
 	switch ( this.state ) {
@@ -279,7 +284,7 @@ Album.prototype._create = function() { // The photos to load for this "page." Ha
 				0.1,
 				100+Math.random()*50
 			);
-			scene.add( p );
+			this.add( p );
 			p.img = indices[index];
 			page.push( p );
 		}
@@ -294,7 +299,7 @@ Album.prototype._create = function() { // The photos to load for this "page." Ha
 					0.1,
 					100+Math.random()*50
 				);
-				scene.add( p );
+				this.add( p );
 				p.img = indices[index];
 				page.push( p );
 			}
@@ -440,6 +445,8 @@ if ( !albumUrls ) {
 	albumUrls = albums[ albumName ];
 }
 var album = new Album( albumUrls );
+album.rotateX( -Math.PI/2 );
+scene.add( album );
 document.title = "Photopticon Viewer" + " : " + albumName;
 
 

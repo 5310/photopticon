@@ -21,9 +21,14 @@ function init() {
 
 	scene = new THREE.Scene();
 
+//	cameraRig = new THREE.Object3D();
+//	cameraRig.up.set( 0, 0, 1 );
+//	scene.add(cameraRig);
+	
 	camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
 	//	camera.position.set(0, 0, 10);
-	camera.up.set( 0, 0, 1 );
+//	camera.up.set( 0, 0, 1 );
+	camera.rotateX( Math.PI/2 );
 	scene.add(camera);
 
 	controls = new THREE.OrbitControls(camera, element);
@@ -36,7 +41,8 @@ function init() {
 	controls.noPan = true;
 
 	function setOrientationControls(e) {
-		if (!e.alpha) {
+		
+		if ( !e.alpha ) {
 			return;
 		}
 
@@ -47,7 +53,9 @@ function init() {
 		element.addEventListener('click', fullscreen, false);
 
 		window.removeEventListener('deviceorientation', setOrientationControls);
+		
 	}
+	
 	window.addEventListener('deviceorientation', setOrientationControls, true);
 
 	window.addEventListener('resize', resize, false);
@@ -74,7 +82,9 @@ function update(dt) {
 
 	camera.updateProjectionMatrix();
 
-	controls.update(dt);
+	if ( controls ) {
+		controls.update(dt);
+	}
 
 }
 
