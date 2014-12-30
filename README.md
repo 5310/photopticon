@@ -31,7 +31,7 @@ When the app is opened, it will show a list of all available albums.
 	-	This has a brief timeout: The hover has to linger over the button for a while.
 	-	The cursor will shrink to signify the action.
 	-	After the cursors vanishes and then resets, you'll see the current page move out of the scene and the new page appear.
-6.	Go back on yourbrowser to return to the album index.
+6.	Go back on your browser to return to the album index.
 
 ## Requirements
 
